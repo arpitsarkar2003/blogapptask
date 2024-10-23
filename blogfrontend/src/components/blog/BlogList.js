@@ -8,7 +8,7 @@ import { Calendar } from 'lucide-react';
 
 export default function BlogList() {
   const { blogPosts } = useBlog();
-  const { isAuthenticated } = useAuth(); // Check if the user is authenticated
+  const { isAuthenticated } = useAuth();
 
   return (
     <div>
@@ -35,7 +35,7 @@ export default function BlogList() {
                     <Calendar className="h-3 w-3 text-gray-500" />
                     <span className="text-xs text-gray-500">{formatDate(post.createdAt)}</span>
                   </div>
-                  <Link to={`/blog/${post.id}`}>
+                  <Link to={`/blog/${post._id}`}>
                     <Button variant="outline">Read More</Button>
                   </Link>
                 </div>

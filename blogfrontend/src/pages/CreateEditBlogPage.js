@@ -4,7 +4,7 @@ import BlogForm from '../components/blog/BlogForm'
 
 export default function CreateEditBlogPage() {
   const { id } = useParams()
-  const postId = id ? parseInt(id, 10) : undefined
+  const postId = id || undefined;
 
   return (
     <div>

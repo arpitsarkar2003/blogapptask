@@ -1,28 +1,53 @@
-import React from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { useBlog } from '../../contexts/BlogContext'
-import { useAuth } from '../../contexts/AuthContext'
-import { formatDate } from '../../utils/formatDate'
-import { Button } from '../ui/Button'
+import { useBlog } from '../../contexts/BlogContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { formatDate } from '../../utils/formatDate';
+import { Button } from '../ui/Button';
 
-export default function BlogPost() {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const { getBlogPost, deleteBlogPost } = useBlog()
-  const { user } = useAuth()
-  const post = getBlogPost(parseInt(id, 10))
+export default function BlogPost({ id }) {
+  const navigate = useNavigate();
+  const { getBlogPost, deleteBlogPost } = useBlog();
+  const { user } = useAuth();
+
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const fetchedPost = await getBlogPost(id);
+        setPost(fetchedPost);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [id, getBlogPost]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   if (!post) {
-    return <div>Blog post not found</div>
+    return <div>Blog post not found</div>;
   }
 
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this post?')) {
-      await deleteBlogPost(post.id)
-      navigate('/')
+      await deleteBlogPost(post._id);
+      navigate('/');
     }
-  }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -34,12 +59,12 @@ export default function BlogPost() {
       </div>
       {user && user.id === post.authorId && (
         <div className="flex space-x-4">
-          <Link to={`/edit/${post.id}`}>
+          <Link to={`/edit/${post._id}`}>
             <Button variant="outline">Edit</Button>
           </Link>
           <Button variant="destructive" onClick={handleDelete}>Delete</Button>
         </div>
       )}
     </div>
-  )
+  );
 }

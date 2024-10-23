@@ -79,12 +79,13 @@ exports.deletePost = async (req, res) => {
       return res.status(404).json({ msg: 'Post not found' });
     }
 
-    // Check user
+    // Check user authorization
     if (post.author.toString() !== req.user.id) {
       return res.status(401).json({ msg: 'User not authorized' });
     }
 
-    await post.remove();
+    // for deleting the post
+    await Post.findByIdAndDelete(req.params.id);
 
     res.json({ msg: 'Post removed' });
   } catch (err) {

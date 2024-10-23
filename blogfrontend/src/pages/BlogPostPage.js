@@ -7,7 +7,7 @@ export default function BlogPostPage() {
 
   return (
     <div>
-      <BlogPost />
+      <BlogPost id={id} />
     </div>
   )
 }

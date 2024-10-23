@@ -12,27 +12,39 @@ export default function BlogForm({ postId }) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [image, setImage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (postId) {
-      const post = getBlogPost(postId);
-      if (post) {
-        setTitle(post.title);
-        setContent(post.content);
-        setImage(post.image || '');
+    const fetchPost = async () => {
+      if (postId) {
+        const post = await getBlogPost(postId);
+        if (post) {
+          setTitle(post.title);
+          setContent(post.content);
+          setImage(post.image || '');
+        }
       }
-    }
+    };
+
+    fetchPost();
   }, [postId, getBlogPost]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const blogPost = { title, content, image };
-    if (postId) {
-      await updateBlogPost(postId, blogPost);
-    } else {
-      await createBlogPost(blogPost);
+    try {
+      if (postId) {
+        await updateBlogPost({ id: postId, ...blogPost });
+      } else {
+        await createBlogPost(blogPost);
+      }
+      navigate('/');
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    } finally {
+      setLoading(false);
     }
-    navigate('/');
   };
 
   return (
@@ -64,7 +76,9 @@ export default function BlogForm({ postId }) {
           onChange={(e) => setImage(e.target.value)}
         />
       </div>
-      <Button type="submit">{postId ? 'Update' : 'Create'} Blog Post</Button>
+      <Button type="submit" variant="outline" disabled={loading}>
+        {postId ? 'Update' : 'Create'} Blog Post
+      </Button>
     </form>
   );
 }
