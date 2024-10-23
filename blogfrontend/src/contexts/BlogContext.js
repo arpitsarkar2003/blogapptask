@@ -1,13 +1,15 @@
 import React, { createContext, useContext } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
+import { useAuth } from './AuthContext';
 
 const BlogContext = createContext();
 
 export const BlogProvider = ({ children }) => {
   const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuth(); // Access the authentication state from AuthContext
 
-  // Query for fetching blog posts
+  // Query for fetching blog posts only if the user is authenticated
   const { 
     data: blogPosts, 
     isLoading, 
@@ -16,11 +18,13 @@ export const BlogProvider = ({ children }) => {
   } = useQuery({
     queryKey: ['blogPosts'],
     queryFn: async () => {
+      if (!isAuthenticated) return []; // Return empty if not authenticated
       const response = await api.get('/posts');
       return response.data;
     },
     retry: 1,
     staleTime: 30000, // Consider data fresh for 30 seconds
+    enabled: isAuthenticated, // Only run the query if authenticated
   });
 
   // Get single blog post
@@ -73,7 +77,7 @@ export const BlogProvider = ({ children }) => {
   return (
     <BlogContext.Provider
       value={{
-        blogPosts,
+        blogPosts: blogPosts || [],
         isLoading,
         error,
         refetch,

@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.get('/user');
+      const response = await api.get('/auth/user');
       setUser(response.data);
     } catch (error) {
       console.error('Error fetching user:', error);

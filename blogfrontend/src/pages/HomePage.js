@@ -1,9 +1,10 @@
 import React from 'react'
+import BlogList from '../components/blog/BlogList'
 
-function HomePage() {
+export default function HomePage() {
   return (
-    <div>HomePage</div>
+    <div>
+      <BlogList />
+    </div>
   )
 }
-
-export default HomePage
